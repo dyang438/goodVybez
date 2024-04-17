@@ -1,11 +1,14 @@
 // Import statements using ES6 syntax
+import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from './models/User'; // Adjust the User model export to be compatible with ES6 imports
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 
+const router = express.Router();
+
 // Register User route
-app.post('/register', [
+router.post('/register', [
   body('username').isString(),
   body('password').isLength({ min: 5 })
 ], async (req, res) => {
@@ -24,7 +27,7 @@ app.post('/register', [
 });
 
 // Login User route
-app.post('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
     if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
@@ -37,3 +40,5 @@ app.post('/login', async (req, res) => {
     res.status(500).send(error.message);
   }
 });
+
+export default router;
