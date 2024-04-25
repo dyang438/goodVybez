@@ -1,28 +1,51 @@
 import express from 'express';
+import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import authRoutes from './authRoutes';
-//const cors = require('cors');
-require('dotenv').config();
+import cookieSession from 'cookie-session';
+import bodyParser from 'body-parser';
+import accountRouter from './routes/accountRoutes';
+import postRouter from './routes/postRoutes';
 
+// read environment variables from .env file
+dotenv.config();
+const PORT = process.env.PORT ?? 8000;
 
 const app = express();
 
-app.use(express.json()); // for parsing application/json
+app.use(cookieSession({
+  name: 'session',
+  keys: ['k1', 'k2'],
+  maxAge: 24 * 60 * 60 * 1000
+}));
 
-// MongoDB connection
-mongoose.connect( process.env.MONGODB_URI || '' )
+app.use(bodyParser.json());
+
+const MONGO_URI = process.env.MONGODB_URI ?? '';
+mongoose.connect(MONGO_URI)
   .catch((error) => {
     console.error('MongoDB connection error:', error.message);
   });
 
-const PORT = process.env.PORT || 8000;
-
-app.get('/api/', (_, res) => {
+// define root route
+app.get('/', (_, res) => {
   res.json({ message: 'Hello, frontend!' });
 });
 
-app.use('/api/accounts/', authRoutes);
+app.get('/api/bye', (_, res) => {
+  return res.json({ message: 'Bye, frontend!' });
+});
 
+app.get('/api/hello', (_, res) => {
+  return res.json({ message: 'Hello, frontend!' });
+});
+
+// account routes
+app.use('/api/account', accountRouter);
+
+// question routes
+app.use('/api/questions', postRouter);
+
+// listen
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Now listening on port ${PORT}.`);
 });
