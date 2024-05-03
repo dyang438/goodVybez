@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-
-const RequireAuth = (req: Request, res: Response, next: NextFunction): void => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const RequireAuth = (req, res, next) => {
   if (!req.session || !req.session.user || req.session.user === "") {
     const err = new Error("No active session");
     res.status(401);
@@ -9,5 +9,4 @@ const RequireAuth = (req: Request, res: Response, next: NextFunction): void => {
     next();
   }
 };
-
-export default RequireAuth;
+exports.default = RequireAuth;
